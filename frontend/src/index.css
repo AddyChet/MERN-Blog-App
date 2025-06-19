@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+
+#textEditor h2 {
+  font-size: 1.7rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+#textEditor h3 {
+  font-size: 1.3rem;
+  font-weight: semi-bold;
+  margin-bottom: 0.5rem;
+}
