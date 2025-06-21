@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext} from "react";
 import { RxCross1 } from "react-icons/rx";
 import { EditorContext } from "../context/EditorContext";
 

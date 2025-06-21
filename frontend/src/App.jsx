@@ -8,12 +8,9 @@ import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import { FaSpinner } from "react-icons/fa";
 import Editor from "./Pages/Editor";
-import { EditorContext } from "./context/EditorContext";
-import PublishBlog from "./Components/PublishBlog";
 
 const App = () => {
   const { user, loading } = useContext(AuthContext);
-  const { editorState } = useContext(EditorContext);
 
   const location = useLocation();
   const hideNavbarOn = ["/editor/publish"]; // add any path where navbar shouldn't show

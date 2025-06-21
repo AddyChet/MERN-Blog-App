@@ -10,10 +10,10 @@ import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
-  const { editorState, blogState :{title, banner, des, tags}, textEditor, setBlogState, blogState, setEditorState, publishDraft} = useContext(EditorContext);
+  const { editorState, blogState :{title, banner, des, tags}, textEditor, setBlogState, blogState, setEditorState, publishDraft, userDetails} = useContext(EditorContext);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-
+  console.log(userDetails)
   const navCondition =
     (editorState === "editor" || editorState === "publish") &&
     window.location.pathname === "/editor/create";

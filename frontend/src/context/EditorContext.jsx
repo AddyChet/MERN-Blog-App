@@ -1,15 +1,20 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { createContext } from "react";
 import axiosInstance from "../config/axiosInstance";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router";
+import { useEffect } from "react";
+// import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 export const EditorContext = createContext(null);
 
 export const EditorProvider = ({ children }) => {
-
   const [editorState, setEditorState] = useState("editor");
   const [textEditor, setTextEditor] = useState({ isReady: false });
+  const [blogs, setBlogs] = useState(null)
+  const [trendingBlogs, setTrendingBlogs] = useState(null)
+  const { user } = useContext(AuthContext);
+  const [pageState, setPageState] = useState("home")
 
   const blogStructure = {
     title: "",
@@ -21,6 +26,36 @@ export const EditorProvider = ({ children }) => {
   };
 
   const [blogState, setBlogState] = useState(blogStructure);
+  const [blogsFetched, setBlogsFetched] = useState(false);
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const [latestRes, trendingRes] = await Promise.all([
+        axiosInstance.get("/blog/latest-blog"),
+        axiosInstance.get("/blog/trending-blog")
+      ]);
+
+      const latest = latestRes?.data?.blogs || [];
+      const trending = trendingRes?.data?.blogs || [];
+
+      setBlogs(latest);
+      setTrendingBlogs(trending);
+      setBlogsFetched(true); // ✅ prevent redundant fetches
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong while fetching blogs.");
+    }
+  };
+
+  if (pageState === "home" && !blogsFetched) {
+    fetchData();
+  }
+  console.log("hello")
+}, [pageState, blogsFetched]);
+
+
 
   const uploadBanner = async (image) => {
     const formData = new FormData();
@@ -78,7 +113,7 @@ export const EditorProvider = ({ children }) => {
           isLoading: false,
           autoClose: 3000,
           closeOnClick: true,
-        })
+        });
       } else {
         toast.update(toastId, {
           render: "Upload failed",
@@ -88,8 +123,10 @@ export const EditorProvider = ({ children }) => {
           closeOnClick: true,
         });
       }
-     setBlogState(blogStructure)
+      setBlogState(blogStructure);
 
+      // ✅ Force re-fetch blogs
+      setBlogsFetched(false);  
     } catch (error) {
       if (error.response?.data?.error) {
         error.response.data.error.map((e) => toast.error(e));
@@ -110,7 +147,7 @@ export const EditorProvider = ({ children }) => {
           isLoading: false,
           autoClose: 3000,
           closeOnClick: true,
-        })
+        });
       } else {
         toast.update(toastId, {
           render: "Error: Draft was not saved! ❌",
@@ -120,8 +157,7 @@ export const EditorProvider = ({ children }) => {
           closeOnClick: true,
         });
       }
-     setBlogState(blogStructure)
-
+      setBlogState(blogStructure);
     } catch (error) {
       if (error.response?.data?.error) {
         error.response.data.error.map((e) => toast.error(e));
@@ -131,7 +167,6 @@ export const EditorProvider = ({ children }) => {
     }
   };
 
-  console.log(blogState);
   return (
     <EditorContext.Provider
       value={{
@@ -143,7 +178,12 @@ export const EditorProvider = ({ children }) => {
         setTextEditor,
         uploadBanner,
         publishBlog,
-        publishDraft
+        publishDraft,
+        blogs,
+        trendingBlogs,
+        setBlogs,
+        pageState,
+        setPageState
       }}
     >
       {children}

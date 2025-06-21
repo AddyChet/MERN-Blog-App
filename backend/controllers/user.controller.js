@@ -81,7 +81,7 @@ export const login = async (req, res) => {
       return res.status(403).json({ error: errorMessages });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email })
     if (!user) return responseFunction(404, "Invalid Credentials", res);
     const comparePassword = await bcrypt.compare(password, user.password);
     if (!comparePassword)
@@ -96,7 +96,7 @@ export const login = async (req, res) => {
       sameSite: "strict",
     });
 
-    return responseFunction(200, "User Logged in successfully", res, { token });
+    return responseFunction(200, "User Logged in successfully", res, user);
   } catch (error) {
     console.log(`error in login: ${error.message}`);
     return responseFunction(500, "Internal server error", res);

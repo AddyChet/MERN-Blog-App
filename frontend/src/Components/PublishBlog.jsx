@@ -55,7 +55,7 @@ const PublishBlog = () => {
     setBlogState({ ...blogState, des: e.target.value });
   };
 
-  const handlePublishBlog = async (e) => {
+  const handlePublishBlog = async () => {
 
     if (!title || !title.trim()) {
       return toast.error("Title is required");
@@ -177,7 +177,7 @@ const PublishBlog = () => {
           <button
             disabled={isDisabled}
             onClick={handlePublishBlog}
-            className={`mt-4 cursor-pointer border px-3 py-1 rounded-3xl transition duration-300 
+            className={`cursor-pointer border px-3 py-1 rounded-3xl transition duration-300 
             ${
               isDisabled
                 ? "bg-gray-400 cursor-not-allowed opacity-50"

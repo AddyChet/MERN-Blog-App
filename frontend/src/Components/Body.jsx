@@ -1,72 +1,94 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SideBar from "./SideBar";
 import NavigationInline from "../common/NavigationInline";
+import AnimationWrapper from "../common/AnimationWrapper";
+import { BsHeart } from "react-icons/bs";
+import { useContext } from "react";
+import { EditorContext } from "../context/EditorContext";
+import BlogCard from "./BlogCard";
+import TrendingBlogCard from "./TrendingBlogCard";
+import { Link } from "react-router";
 
-const con = ["Home", "Trending"];
 const Body = () => {
+  const { pageState } = useContext(EditorContext);
   const [activeIndex, setActiveIndex] = useState(0);
+  const { blogs, trendingBlogs } = useContext(EditorContext);
+  const con = pageState === "home" ? [pageState, "trending"] : [pageState];
+
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex w-full border-b border-gray-200">
-        {con.map((e, i) => (
-          <NavigationInline
-            key={i}
-            text={e}
-            index={i}
-            activeIndex={activeIndex}
-            setActiveIndex={setActiveIndex}
-          />
-        ))}
-      </div>
+    <AnimationWrapper>
+      <div className="w-4/5 mx-auto">
+        {/* Navigation */}
+        <div className="flex w-full border-b border-gray-200">
+          {con.map((e, i) => (
+            <NavigationInline
+              key={i}
+              text={e}
+              index={i}
+              activeIndex={activeIndex}
+              setActiveIndex={setActiveIndex}
+            />
+          ))}
+        </div>
 
-      {con[activeIndex] === "Home" ? (
-        <>
-          <div className="px-4 py-8 pt-0 flex flex-col lg:flex-row gap-8 mt-8">
-            {/* Blog Content */}
-
-            <div className="flex-1 flex flex-col gap-10">
-              <div className="flex flex-col gap-8">
-                {/* Blog Card */}
-                <div className="flex flex-col md:flex-row gap-6 border-b border-gray-300 pb-8">
-                  {/* Image */}
-                  <div className="w-full md:w-1/2">
-                    <img
-                      className="w-full h-64 md:h-full object-cover rounded-md"
-                      src="https://cdn.pixabay.com/photo/2025/05/30/17/15/mountain-9631829_1280.jpg"
-                      alt="The Himalayas"
-                    />
-                  </div>
-
-                  {/* Text Content */}
-                  <div className="w-full md:w-1/2 flex flex-col justify-center gap-4">
-                    <h1 className="text-xl font-semibold text-gray-800">
-                      The Himalayas were formed billions of years ago
-                    </h1>
-                    <div className="text-sm text-gray-500 flex gap-3">
-                      <span>Adarsh</span>
-                      <span>11/02/2025 11:30 PM</span>
-                    </div>
-                    <p className="text-base text-gray-700">
-                      Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                      Hic deserunt aut corrupti possimus a sint illum eos,
-                      minima doloremque assumenda eligendi repellendus velit
-                      alias ipsa maxime dolor dolorem cumque dicta.
-                    </p>
-                  </div>
+        {/* Main content and sidebar */}
+        <div className="flex gap-5">
+          <div className="flex-1">
+            {con[activeIndex] === pageState ? (
+              pageState === "home" ? (
+                blogs === null ? (
+                  <div>loading....</div>
+                ) : (
+                  blogs.map((blog, i) => (
+                    <AnimationWrapper
+                      key={i}
+                      transition={{ duration: 1, delay: i * 0.1 }}
+                    >
+                      <BlogCard index={i} blog={blog} />
+                    </AnimationWrapper>
+                  ))
+                )
+              ) : (
+                <div className="flex flex-col justify-center items-center h-40 text-gray-400">
+                  No content for “{pageState}”
+                  <span>
+                    Click to go back to{" "}
+                    <button
+                      className="text-gray-700 cursor-pointer"
+                      onClick={handleReload}
+                    >
+                      Home
+                    </button>
+                  </span>
                 </div>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="w-full lg:w-1/3 hidden lg:block">
-              <SideBar />
-            </div>
+              )
+            ) : con[activeIndex] === "trending" && pageState === "home" ? (
+              trendingBlogs === null ? (
+                <div>loading....</div>
+              ) : (
+                trendingBlogs.map((blog, i) => (
+                  <AnimationWrapper
+                    key={i}
+                    transition={{ duration: 1, delay: i * 0.1 }}
+                  >
+                    <TrendingBlogCard blog={blog} index={i} />
+                  </AnimationWrapper>
+                ))
+              )
+            ) : null}
           </div>
-        </>
-      ) : (
-        <div>Trneing post</div>
-      )}
-    </div>
+
+          {/* sidebar */}
+          <div className="min-w-[40%] lg:min-w-[340px] max-w-min border-l border-gray-200 pl-8 pt-3 hidden lg:block">
+            <SideBar />
+          </div>
+        </div>
+      </div>
+    </AnimationWrapper>
   );
 };
 

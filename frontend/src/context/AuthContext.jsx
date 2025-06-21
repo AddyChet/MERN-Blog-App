@@ -7,18 +7,18 @@ export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-
+  const [userDetails, setUserDetails] = useState(null)
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loading, setIsLoading] = useState(true);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const navigate = useNavigate();
+  console.log(userDetails)
 
   useEffect(() => {
     async function fetchUser() {
       try {
         const res = await axiosInstance.get("/users/me");
         const userId = res.data?.data?.userId;
-        console.log(userId);
         setUser(userId);
       } catch (error) {
         console.log("error in fetching user");
@@ -50,7 +50,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     setIsLoggingIn(true);
     try {
-      await axiosInstance.post("/users/login", userData);
+      const loginRes = await axiosInstance.post("/users/login", userData);
+      console.log(loginRes.data?.data)
+      setUserDetails(loginRes.data?.data)
       const res = await axiosInstance.get("/users/me");
 
       const userId = res.data?.data?.userId;
@@ -82,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   };
   return (
     <AuthContext.Provider
-      value={{ signup, isSigningIn, isLoggingIn, login, loading, user, logout }}
+      value={{ signup, isSigningIn, isLoggingIn, login, loading, user, logout, userDetails }}
     >
       {children}
     </AuthContext.Provider>
