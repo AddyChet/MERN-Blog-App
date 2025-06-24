@@ -5,16 +5,21 @@ import { toast } from "react-toastify";
 import { useEffect } from "react";
 // import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
+import { FilterPagination } from "../common/FilterPagination";
 
 export const EditorContext = createContext(null);
 
 export const EditorProvider = ({ children }) => {
   const [editorState, setEditorState] = useState("editor");
   const [textEditor, setTextEditor] = useState({ isReady: false });
-  const [blogs, setBlogs] = useState(null)
-  const [trendingBlogs, setTrendingBlogs] = useState(null)
+
+
+  const [blogs, setBlogs] = useState(null); // what we render now
+
+  const [trendingBlogs, setTrendingBlogs] = useState(null);
   const { user } = useContext(AuthContext);
-  const [pageState, setPageState] = useState("home")
+  const [pageState, setPageState] = useState("home");
+  const [loadingCategory, setLoadingCategory] = useState(true);
 
   const blogStructure = {
     title: "",
@@ -28,33 +33,47 @@ export const EditorProvider = ({ children }) => {
   const [blogState, setBlogState] = useState(blogStructure);
   const [blogsFetched, setBlogsFetched] = useState(false);
 
+  const fetchLatestBlogs = async (page = 1) => {
+  const latestRes = await axiosInstance.post("/blog/latest-blog", { page });
+
+  const formattedData = await FilterPagination({
+    state: blogs,
+    data: latestRes?.data?.blogs,
+    page,
+    counteRoute: "/blog/all-latest-blogs-count",
+  });
+
+  setBlogs(formattedData);
+};
+
+const fetchTrendingBlogs = async () => {
+  const trendingRes = await axiosInstance.get("/blog/trending-blog");
+  const trending = trendingRes?.data?.blogs || [];
+  setTrendingBlogs(trending);
+};
 
 useEffect(() => {
-  const fetchData = async () => {
+
+  const fetchData = async (page = 1) => {
     try {
-      const [latestRes, trendingRes] = await Promise.all([
-        axiosInstance.get("/blog/latest-blog"),
-        axiosInstance.get("/blog/trending-blog")
+      await Promise.all([
+        fetchLatestBlogs(page),
+        fetchTrendingBlogs()
       ]);
-
-      const latest = latestRes?.data?.blogs || [];
-      const trending = trendingRes?.data?.blogs || [];
-
-      setBlogs(latest);
-      setTrendingBlogs(trending);
-      setBlogsFetched(true); // ✅ prevent redundant fetches
+      setBlogsFetched(true);
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong while fetching blogs.");
+      // console.log(error);
     }
+    setLoadingCategory(false);
   };
 
-  if (pageState === "home" && !blogsFetched) {
+  if (pageState === "home" || trendingBlogs === null) {
+    console.log("Fetching data on first load...");
     fetchData();
   }
-  console.log("hello")
-}, [pageState, blogsFetched]);
 
+  
+}, [pageState, user]);
 
 
   const uploadBanner = async (image) => {
@@ -126,7 +145,7 @@ useEffect(() => {
       setBlogState(blogStructure);
 
       // ✅ Force re-fetch blogs
-      setBlogsFetched(false);  
+      setBlogsFetched(false);
     } catch (error) {
       if (error.response?.data?.error) {
         error.response.data.error.map((e) => toast.error(e));
@@ -167,6 +186,18 @@ useEffect(() => {
     }
   };
 
+  const fetchBlogByCategory = async (tag) => {
+    try {
+      const res = await axiosInstance.post("/blog/search-blogs", { tag });
+      setBlogs({
+        ...blogs,
+        results: res.data?.blogs
+      });
+    } catch (error) {
+      toast.error("Could not fetch category blogs");
+    }
+  };
+
   return (
     <EditorContext.Provider
       value={{
@@ -183,7 +214,10 @@ useEffect(() => {
         trendingBlogs,
         setBlogs,
         pageState,
-        setPageState
+        setPageState,
+        fetchBlogByCategory,
+        loadingCategory,
+        fetchLatestBlogs
       }}
     >
       {children}

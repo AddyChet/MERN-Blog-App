@@ -105,33 +105,66 @@ export const publishBlog = async (req, res) => {
 
 export const latestBlog = async (req, res) => {
   try {
-    const maxLimit = 5
+    const {page} = req.body
+    const maxLimit = 5;
     const blog = await Blog.find({ draft: false })
       .populate("author", "firstName lastName profile_pic -_id")
       .sort({ publishAt: -1 })
       .select("blog_id title des banner activity tags publishedAt -_id")
-      .limit(maxLimit)
+      .skip((page-1) * maxLimit)
+      .limit(maxLimit);
 
-    return res.status(200).json({blogs : blog})
+    return res.status(200).json({ blogs: blog });
   } catch (error) {
     console.error("latestBlog Error:", err);
     res.status(500).json({ error: err.message });
   }
 };
 
+export const allLatestBlogs = async (req,res)=> {
+  try {
+    const count = await Blog.countDocuments({draft : false})
+    return res.status(200).json({ totalDocs: count });
+  } catch (error) {
+    console.error("allLatestBlogs Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+}
 
 export const trendingBlog = async (req, res) => {
   try {
-    const maxLimit = 5
+    const maxLimit = 5;
     const blog = await Blog.find({ draft: false })
       .populate("author", "firstName lastName profile_pic -_id")
-      .sort({"activity.total_reads" : -1,  "activity.total_likes" : -1 ,publishedAt: -1 })
+      .sort({
+        "activity.total_reads": -1,
+        "activity.total_likes": -1,
+        publishedAt: -1,
+      })
       .select("blog_id title publishedAt -_id")
-      .limit(maxLimit)
+      .limit(maxLimit);
 
-    return res.status(200).json({blogs : blog})
+    return res.status(200).json({ blogs: blog });
   } catch (error) {
     console.error("latestBlog Error:", err);
     res.status(500).json({ error: err.message });
+  }
+};
+
+export const filterBlog = async (req, res) => {
+  try {
+    const maxLimit = 5;
+    const { tag } = req.body;
+
+    const blog = await Blog.find({ tags: tag, draft: false })
+      .populate("author", "firstName lastName profile_pic -_id")
+      .sort({ publishAt: -1 })
+      .select("blog_id title des banner activity tags publishedAt -_id")
+      .limit(maxLimit);
+
+    return res.status(200).json({ blogs: blog });
+  } catch (error) {
+    console.error("filterBlog Error:", error);
+    res.status(500).json({ error: error.message });
   }
 };

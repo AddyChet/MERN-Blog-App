@@ -1,6 +1,7 @@
 
 
 const NavigationInline = ({ text, setActiveIndex, activeIndex, index}) => {
+
   return (
     <div className="relative flex flex-nowrap overflow-x-auto ">
       <button

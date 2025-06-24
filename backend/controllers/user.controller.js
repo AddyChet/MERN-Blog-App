@@ -96,7 +96,7 @@ export const login = async (req, res) => {
       sameSite: "strict",
     });
 
-    return responseFunction(200, "User Logged in successfully", res, user);
+    return responseFunction(200, "User Logged in successfully", res);
   } catch (error) {
     console.log(`error in login: ${error.message}`);
     return responseFunction(500, "Internal server error", res);
@@ -115,12 +115,10 @@ export const logout = async (req, res) => {
 
 export const checkAuth = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.userId).select("-password");
     if (!user) return responseFunction(404, "User not found", res);
 
-    return responseFunction(200, "User authenticated", res, {
-      userId: user._id,
-    });
+    return responseFunction(200, "User authenticated", res, user);
   } catch (error) {
     console.log(`Error in checkAuth: ${error.message}`);
     return responseFunction(500, "Internal server error", res);

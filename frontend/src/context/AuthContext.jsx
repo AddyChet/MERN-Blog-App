@@ -7,25 +7,24 @@ export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [userDetails, setUserDetails] = useState(null)
+
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loading, setIsLoading] = useState(true);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const navigate = useNavigate();
-  console.log(userDetails)
 
   useEffect(() => {
     async function fetchUser() {
       try {
         const res = await axiosInstance.get("/users/me");
-        const userId = res.data?.data?.userId;
-        setUser(userId);
+        const user = res.data?.data;
+        setUser(user);
       } catch (error) {
-        console.log("error in fetching user");
-        console.error(
-          "Failed to fetch user:",
-          error.response?.data || error.message
-        );
+        // console.log("error in fetching user");
+        // console.error(
+        //   "Failed to fetch user:",
+        //   error.response?.data || error.message
+        // );
         setUser(null); // Clear user if request fails
       }
       setIsLoading(false);
@@ -50,22 +49,21 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     setIsLoggingIn(true);
     try {
-      const loginRes = await axiosInstance.post("/users/login", userData);
-      console.log(loginRes.data?.data)
-      setUserDetails(loginRes.data?.data)
+      await axiosInstance.post("/users/login", userData);
+
       const res = await axiosInstance.get("/users/me");
 
-      const userId = res.data?.data?.userId;
-      setUser(userId);
+      const user = res.data?.data;
+      setUser(user);
 
       toast.success("Logged in Succesfully");
 
       navigate("/");
     } catch (error) {
-      if(error.response.data.error) {
+      if (error.response.data.error) {
         error.response.data.error.map((e) => toast.error(e));
-      } else{
-        toast.error(error.response.data.message)
+      } else {
+        toast.error(error.response.data.message);
       }
     }
     setIsLoggingIn(false);
@@ -84,7 +82,15 @@ export const AuthProvider = ({ children }) => {
   };
   return (
     <AuthContext.Provider
-      value={{ signup, isSigningIn, isLoggingIn, login, loading, user, logout, userDetails }}
+      value={{
+        signup,
+        isSigningIn,
+        isLoggingIn,
+        login,
+        loading,
+        user,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import { FaSpinner } from "react-icons/fa";
 import Editor from "./Pages/Editor";
+import SearchPage from "./Components/SearchPage";
 
 const App = () => {
   const { user, loading } = useContext(AuthContext);
@@ -38,6 +39,11 @@ const App = () => {
           <Route
             path="/"
             element={user ? <Body /> : <Navigate to="/login" />}
+          />
+
+          <Route
+            path="/search/:query"
+            element={<SearchPage/>}
           />
         </Routes>
       </div>

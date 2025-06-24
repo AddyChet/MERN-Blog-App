@@ -1,53 +1,50 @@
-import React from "react";
-import SideBar from "./SideBar";
 import { BsHeart } from "react-icons/bs";
 import DateFormat from "../common/DateFormat";
 import { Link } from "react-router";
 
 const BlogCard = ({ blog, index }) => {
   const { firstName, lastName, profile_pic } = blog.author;
-  const { title, des, tags, banner, publishedAt} = blog;
+  const { title, des, tags, banner, publishedAt } = blog;
   const { total_likes } = blog.activity;
   return (
     <>
-    <Link className="flex gap-8 items-center border-b border-gray-300 pb-7 mb-7 mt-4">
-      <div className="w-full">
-        <div className="flex gap-2 items-center mb-4">
-          <img
-            src={profile_pic}
-            className="w-6 h-6 rounded-full"
-          />
-          <p className="line-clamp-1 md:text-md text-sm">{firstName + " " + lastName}</p>
-          <p className="min-h-fit md:text-md text-sm">
-            <DateFormat key={index} date={publishedAt} />
+      <Link className="flex gap-8 relative items-center border-b border-gray-300 pb-7 mb-7 mt-4">
+        <div className="w-full">
+          <div className="flex gap-2 items-center mb-4">
+            <img src={profile_pic} className="w-6 h-6 rounded-full" />
+            <p className="line-clamp-1 md:text-md text-sm">
+              {firstName + " " + lastName}
+            </p>
+            <p className="min-h-fit md:text-md text-sm">
+              <DateFormat key={index} date={publishedAt} />
+            </p>
+          </div>
+
+          <h1 className="md:text-xl text-md font-medium leading-7 line-clamp-3 sm:line-clamp-2">
+            {title}
+          </h1>
+          <p className="m-3 ml-0 text-md leading-7 max-sm:hidden md:max-[1100px]:hidden line-clamp-2">
+            {des}
           </p>
+
+          <div className="flex gap-4 mt-4">
+            <span className="whitespace-nowrap rounded-full text-sm capitalize hover:bg-opacity-80 bg-gray-200 text-black py-1 px-4">
+              {tags[0]}
+            </span>
+            <span className="ml-3 flex items-center gap-2 text-gray-700">
+              <BsHeart />
+              {total_likes}
+            </span>
+          </div>
         </div>
 
-        <h1 className="md:text-xl text-md font-medium leading-7 line-clamp-3 sm:line-clamp-2">
-          {title}
-        </h1>
-        <p className="m-3 ml-0 text-md leading-7 max-sm:hidden md:max-[1100px]:hidden line-clamp-2">
-          {des}
-        </p>
-
-        <div className="flex gap-4 mt-4">
-          <span className="whitespace-nowrap rounded-full text-sm capitalize hover:bg-opacity-80 bg-gray-200 text-black py-1 px-4">
-            {tags[0]}
-          </span>
-          <span className="ml-3 flex items-center gap-2 text-gray-700">
-            <BsHeart />
-            {total_likes}
-          </span>
+        <div className="h-28 aspect-square sm:block hidden">
+          <img
+            src={banner}
+            className="w-full h-full aspect-square  object-cover"
+          />
         </div>
-      </div>
-
-      <div className="h-28 aspect-square sm:block hidden">
-        <img src={banner} className="w-full h-full aspect-square  object-cover" />
-      </div>
-    </Link>
-
-
-
+      </Link>
     </>
   );
 };
@@ -101,8 +98,7 @@ export default BlogCard;
 //               </div>
 //             ))}
 //           </div>
-//         </div>
+//         </div>loading
 //       </div>
 //     </div>
 //   </div>
-
