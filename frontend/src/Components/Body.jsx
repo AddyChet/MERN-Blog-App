@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SideBar from "./SideBar";
 import NavigationInline from "../common/NavigationInline";
 import AnimationWrapper from "../common/AnimationWrapper";
@@ -16,6 +16,15 @@ const Body = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const { blogs, trendingBlogs} = useContext(EditorContext);
   const con = pageState === "home" ? [pageState, "trending"] : [pageState];
+
+  const memoizedBlogList = useMemo(() => {
+  return blogs?.results?.map((blog, i) => (
+    <AnimationWrapper key={i} transition={{ duration: 1, delay: i * 0.1 }}>
+      <BlogCard blog={blog} index={i} />
+    </AnimationWrapper>
+  ));
+}, [blogs]);
+
 
   return (
     <AnimationWrapper>
@@ -49,15 +58,7 @@ const Body = () => {
                 </div>
               ) : (
                 <>
-                  {blogs.results?.map((blog, i) => (
-                  <AnimationWrapper
-                    key={i}
-                    transition={{ duration: 1, delay: i * 0.1 }}
-                  >
-                    <BlogCard index={i} blog={blog} />
-                  </AnimationWrapper>
-                  
-                ))}
+                  {memoizedBlogList}
                 <LoadMoreData state={blogs} /> 
                 </>
 

@@ -4,11 +4,13 @@ import { Navigate, Route, Routes, useLocation } from "react-router";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import { ToastContainer } from "react-toastify";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "./context/AuthContext";
 import { FaSpinner } from "react-icons/fa";
 import Editor from "./Pages/Editor";
 import SearchPage from "./Components/SearchPage";
+import { EditorContext } from "./context/EditorContext";
+
 
 const App = () => {
   const { user, loading } = useContext(AuthContext);
@@ -17,6 +19,8 @@ const App = () => {
   const hideNavbarOn = ["/editor/publish"]; // add any path where navbar shouldn't show
   const shouldHideNavbar = hideNavbarOn.includes(location.pathname);
 
+  
+ 
   if (loading) {
     return (
       <div className="w-screen h-screen flex justify-center items-center">
@@ -24,6 +28,9 @@ const App = () => {
       </div>
     );
   }
+
+
+
 
   return (
     <>
@@ -41,10 +48,7 @@ const App = () => {
             element={user ? <Body /> : <Navigate to="/login" />}
           />
 
-          <Route
-            path="/search/:query"
-            element={<SearchPage/>}
-          />
+          <Route path="/search/:query" element={<SearchPage />} />
         </Routes>
       </div>
 

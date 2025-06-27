@@ -35,17 +35,15 @@ const SideBar = () => {
 
   const handleCategoryFilter = async (category) => {
     if (pageState === category) {
-      // ✅ First change pageState to home
       setPageState("home");
       setActiveCategory(null);
-
-      // ✅ Then fetch and set blogs
-      await fetchLatestBlogs(1);
+      setBlogs(null);
       return;
     }
 
     setActiveCategory(category);
     setPageState(category);
+
     await fetchBlogByCategory(category); // this will call setBlogs with new category data
   };
 

@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 import { LuPenLine } from "react-icons/lu";
 
 const Navbar = () => {
+  const inputRef = useRef();
+  const [lastQuery, setLastQuery] = useState("");
   const { user, logout } = useContext(AuthContext);
   const {
     editorState,
@@ -20,14 +22,15 @@ const Navbar = () => {
     setEditorState,
     publishDraft,
     fetchBlogByCategory,
+    setBlogsFetched,
+    setPageState
   } = useContext(EditorContext);
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const navigate = useNavigate();
   const profileRef = useRef(null);
 
-  console.log(user);
   const navCondition =
     (editorState === "editor" || editorState === "publish") &&
     window.location.pathname === "/editor/create";
@@ -106,10 +109,25 @@ const Navbar = () => {
   }, []);
 
   const handleSearch = async (e) => {
-    if (e.keyCode === 13) {
-      await fetchBlogByCategory(e.target.value.toLowerCase());
-      navigate(`/search/${e.target.value}`);
+    const query = e.target.value.trim().toLowerCase();
+    if (e.key === "Enter" && query && lastQuery !== query) {
+      try {
+        await fetchBlogByCategory(query);
+        navigate(`/search/${query}`);
+        setLastQuery(query);
+      } catch (error) {
+        console.error("Failed to fetch blogs:", error);
+        // Optionally show a user-friendly message
+      }
     }
+  };
+
+  const handleLogo = () => {
+    setLastQuery("")
+    setPageState("home")
+    setBlogsFetched(false);
+    navigate("/");
+    inputRef.current.value = "";
   };
 
   return (
@@ -119,7 +137,7 @@ const Navbar = () => {
           {/* Logo & Search */}
           <div className="flex gap-8 items-center">
             <p className="text-sm md:text-lg cursor-pointer">
-              <GiFeather size={30} onClick={() => navigate("/")} />
+              <GiFeather size={30} onClick={handleLogo} />
             </p>
             <div className="relative">
               {navCondition ? (
@@ -132,6 +150,7 @@ const Navbar = () => {
                 <>
                   <MdOutlineSearch className="absolute left-2 top-5 transform -translate-y-1/2 text-gray-500" />
                   <input
+                    ref={inputRef}
                     onKeyDown={handleSearch}
                     type="text"
                     placeholder="search..."

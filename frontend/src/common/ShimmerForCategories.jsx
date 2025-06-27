@@ -1,4 +1,5 @@
 import React from "react";
+
 import { ShimmerButton, ShimmerDiv } from "shimmer-effects-react";
 
 const ShimmerForCategories = ({loading}) => {

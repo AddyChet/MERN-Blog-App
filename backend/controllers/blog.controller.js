@@ -105,13 +105,13 @@ export const publishBlog = async (req, res) => {
 
 export const latestBlog = async (req, res) => {
   try {
-    const {page} = req.body
+    const { page } = req.body;
     const maxLimit = 5;
     const blog = await Blog.find({ draft: false })
       .populate("author", "firstName lastName profile_pic -_id")
-      .sort({ publishAt: -1 })
+      .sort({ publishedAt: -1 })
       .select("blog_id title des banner activity tags publishedAt -_id")
-      .skip((page-1) * maxLimit)
+      .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
     return res.status(200).json({ blogs: blog });
@@ -121,15 +121,15 @@ export const latestBlog = async (req, res) => {
   }
 };
 
-export const allLatestBlogs = async (req,res)=> {
+export const allLatestBlogs = async (req, res) => {
   try {
-    const count = await Blog.countDocuments({draft : false})
+    const count = await Blog.countDocuments({ draft: false });
     return res.status(200).json({ totalDocs: count });
   } catch (error) {
     console.error("allLatestBlogs Error:", err);
     res.status(500).json({ error: err.message });
   }
-}
+};
 
 export const trendingBlog = async (req, res) => {
   try {
@@ -154,17 +154,30 @@ export const trendingBlog = async (req, res) => {
 export const filterBlog = async (req, res) => {
   try {
     const maxLimit = 5;
-    const { tag } = req.body;
+    const { tag, page} = req.body;
 
     const blog = await Blog.find({ tags: tag, draft: false })
       .populate("author", "firstName lastName profile_pic -_id")
-      .sort({ publishAt: -1 })
+      .sort({ publishedAt: -1 })
       .select("blog_id title des banner activity tags publishedAt -_id")
+      .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
     return res.status(200).json({ blogs: blog });
   } catch (error) {
     console.error("filterBlog Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const filterBlogsCount = async (req, res) => {
+  try {
+    const {tag} = req.body;
+    let findQuery = {tags : tag, draft : false};
+    const count = await Blog.countDocuments(findQuery);
+    return res.status(200).json({ totalDocs: count });
+  } catch (error) {
+    console.error("filterBlogsCount Error:", error);
     res.status(500).json({ error: error.message });
   }
 };

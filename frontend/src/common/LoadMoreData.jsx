@@ -2,9 +2,17 @@ import React from "react";
 import { useContext } from "react";
 import { EditorContext } from "../context/EditorContext";
 
-const LoadMoreData = ({ state }) => {
-  const { fetchLatestBlogs } = useContext(EditorContext);
-  const handleFetchData = async () => await fetchLatestBlogs(state.page + 1);
+const LoadMoreData = ({ state, pageState }) => {
+  // console.log(state, state.pageState) //here pageState is programming
+  const { fetchLatestBlogs, fetchBlogByCategory} =
+    useContext(EditorContext);
+
+    // console.log(pageState) //here page state is home
+  const handleFetchData = async () => {
+    pageState === "home"
+      ? await fetchLatestBlogs(state.page + 1)
+      : await fetchBlogByCategory(pageState, state.page + 1);
+  };
   if (state !== null && state.totalDocs > state.results.length) {
     return (
       <button
